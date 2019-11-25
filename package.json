@@ -1,0 +1,58 @@
+{
+  "name": "jest-console",
+  "version": "0.0.0",
+  "description": "Console mock for Jest",
+  "type": "module",
+  "main": "dist/jest-console.js",
+  "exports": {
+    ".": {
+      "require": "dist/jest-console.js",
+      "default": "index.js"
+    }
+  },
+  "repository": "https://github.com/kevin940726/jest-console.git",
+  "author": "Kai Hao",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "babel index.js -o dist/jest-console.js",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.4",
+    "@babel/core": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "canopic": "^0.2.1"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,css,json,md,mdx,html}": [
+      "prettier --write",
+      "git add"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "printWidth": 80,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "quoteProps": "as-needed",
+    "jsxSingleQuote": false,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "arrowParens": "avoid"
+  }
+}
