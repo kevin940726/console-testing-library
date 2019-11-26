@@ -1,7 +1,7 @@
 {
   "name": "jest-console",
   "version": "0.0.0",
-  "description": "Console mock for Jest",
+  "description": "Mocking console the right way",
   "type": "module",
   "main": "dist/jest-console.js",
   "exports": {
