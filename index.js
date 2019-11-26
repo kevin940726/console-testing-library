@@ -1,9 +1,10 @@
 import { Console } from 'console';
 import { Writable } from 'stream';
+import { toMatchInlineSnapshot } from 'jest-snapshot';
 
 // Keep an instance of the original console and export it
 const originalConsole = global.console;
-
+global.originalConsole = originalConsole;
 export { originalConsole };
 
 const instances = new WeakMap();
@@ -26,6 +27,7 @@ const LEVELS = {
 
 export function createConsole() {
   let logs = [];
+  let records = {};
   let levels = {
     log: '',
     info: '',
@@ -33,13 +35,23 @@ export function createConsole() {
     error: '',
   };
   let currentLevel = undefined;
+  let currentMethod = undefined;
 
   const writable = new Writable({
     write(chunk, encoding, callback) {
-      logs.push([currentLevel, chunk.toString('utf8')]);
+      const message = chunk
+        .toString('utf8')
+        // Strip out the new line character in the end
+        .slice(0, -1);
+      logs.push([currentLevel, message]);
       if (currentLevel && currentLevel in levels) {
-        levels[currentLevel] += chunk;
+        levels[currentLevel] = [levels[currentLevel], message]
+          .filter(Boolean)
+          .join('\n');
       }
+      records[currentMethod] = [records[currentMethod], message]
+        .filter(Boolean)
+        .join('\n');
       callback();
     },
   });
@@ -54,6 +66,7 @@ export function createConsole() {
       const originalFunction = jestConsole[property];
       jestConsole[property] = function() {
         currentLevel = undefined;
+        currentMethod = property;
         Object.keys(LEVELS).forEach(level => {
           if (LEVELS[level].includes(property)) {
             currentLevel = level;
@@ -63,15 +76,25 @@ export function createConsole() {
         return originalFunction.apply(this, arguments);
       };
 
+      Object.defineProperty(jestConsole[property], 'name', {
+        value: property,
+      });
+      jestConsole[property].jestConsole = jestConsole;
+
       if (typeof jest === 'object' && typeof jest.spyOn === 'function') {
         jest.spyOn(jestConsole, property);
+
+        Object.defineProperty(jestConsole[property], 'name', {
+          value: property,
+        });
+        jestConsole[property].jestConsole = jestConsole;
       }
     }
   });
 
   instances.set(jestConsole, {
     get log() {
-      return logs.map(log => log[1]).join('');
+      return logs.map(log => log[1]).join('\n');
     },
     get logs() {
       return logs;
@@ -89,6 +112,9 @@ export function createConsole() {
       get error() {
         return levels.error;
       },
+    },
+    getRecord(method) {
+      return records[method] || '';
     },
   });
 
@@ -110,11 +136,54 @@ export function getLog(jestConsole = global.console) {
 }
 
 if (typeof beforeEach === 'function' && typeof afterEach === 'function') {
-  let cleanup = () => {};
+  let restore = () => {};
 
   beforeEach(() => {
-    cleanup = mockConsole(createConsole());
+    restore = mockConsole(createConsole());
   });
 
-  afterEach(cleanup);
+  afterEach(restore);
+}
+
+if (typeof expect === 'function' && typeof expect.extend === 'function') {
+  expect.extend({
+    toMatchInlineSnapshot(received, ...args) {
+      /* ------- Workaround for custom inline snapshot matchers ------- */
+      const error = new Error();
+      const stacks = error.stack.split('\n');
+
+      for (let i = 1; i < stacks.length; i += 1) {
+        if (stacks[i].includes(__filename)) {
+          stacks.splice(1, i);
+          break;
+        }
+      }
+
+      error.stack = stacks.join('\n');
+
+      const context = Object.assign(this, { error });
+      /* -------------------------------------------------------------- */
+
+      const jestConsoleInstance =
+        (received && received.jestConsole) || received;
+
+      if (!jestConsoleInstance || !instances.has(jestConsoleInstance)) {
+        return toMatchInlineSnapshot.call(context, received, ...args);
+      }
+
+      if (typeof received === 'function') {
+        return toMatchInlineSnapshot.call(
+          context,
+          getLog().getRecord(received.name),
+          ...args
+        );
+      } else if (typeof received === 'object') {
+        return toMatchInlineSnapshot.call(
+          context,
+          getLog(received).log,
+          ...args
+        );
+      }
+    },
+  });
 }

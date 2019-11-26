@@ -54,5 +54,8 @@
     "bracketSpacing": true,
     "jsxBracketSameLine": false,
     "arrowParens": "avoid"
+  },
+  "dependencies": {
+    "jest-snapshot": "^24.9.0"
   }
 }

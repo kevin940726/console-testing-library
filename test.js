@@ -5,10 +5,7 @@ expect(jest.isMockFunction(console.log)).toBe(false);
 test('simple', () => {
   console.log('Hello %s!', 'World');
 
-  expect(getLog().log).toMatchInlineSnapshot(`
-    "Hello World!
-    "
-  `);
+  expect(getLog().log).toMatchInlineSnapshot(`"Hello World!"`);
 });
 
 test('advanced', () => {
@@ -42,15 +39,13 @@ test('advanced', () => {
       [prototype]: foo { [constructor]: [Circular] }
     }
     It works with error too
-    It works with warning too
-    "
+    It works with warning too"
   `);
   expect(getLog().logs).toMatchInlineSnapshot(`
     Array [
       Array [
         "log",
-        "It works with inline value: foobar, as well as floating point value: 3.14. Pretty cool!
-    ",
+        "It works with inline value: foobar, as well as floating point value: 3.14. Pretty cool!",
       ],
       Array [
         "log",
@@ -62,18 +57,15 @@ test('advanced', () => {
       [length]: 0,
       [name]: 'foo',
       [prototype]: foo { [constructor]: [Circular] }
-    }
-    ",
+    }",
       ],
       Array [
         "error",
-        "It works with error too
-    ",
+        "It works with error too",
       ],
       Array [
         "warn",
-        "It works with warning too
-    ",
+        "It works with warning too",
       ],
     ]
   `);
@@ -87,17 +79,14 @@ test('advanced', () => {
       [length]: 0,
       [name]: 'foo',
       [prototype]: foo { [constructor]: [Circular] }
-    }
-    "
+    }"
   `);
-  expect(getLog().levels.warn).toMatchInlineSnapshot(`
-    "It works with warning too
-    "
-  `);
-  expect(getLog().levels.error).toMatchInlineSnapshot(`
-    "It works with error too
-    "
-  `);
+  expect(getLog().levels.warn).toMatchInlineSnapshot(
+    `"It works with warning too"`
+  );
+  expect(getLog().levels.error).toMatchInlineSnapshot(
+    `"It works with error too"`
+  );
 });
 
 test('they are also mock functions', () => {
@@ -108,4 +97,25 @@ test('they are also mock functions', () => {
   expect(console.log).toHaveBeenCalledTimes(1);
   expect(getLog().log).toBe('');
   expect(getLog().logs).toMatchInlineSnapshot(`Array []`);
+});
+
+test('custom toMatchInlineSnapshot on console', () => {
+  console.log('Hello %s!', 'log');
+  console.info('Hello %s!', 'info');
+  console.warn('Hello %s!', 'warn');
+  console.error('Hello %s!', 'error');
+  console.debug('Hello %s!', 'debug');
+
+  expect(console.log).toMatchInlineSnapshot(`"Hello log!"`);
+  expect(console.info).toMatchInlineSnapshot(`"Hello info!"`);
+  expect(console.warn).toMatchInlineSnapshot(`"Hello warn!"`);
+  expect(console.error).toMatchInlineSnapshot(`"Hello error!"`);
+  expect(console.debug).toMatchInlineSnapshot(`"Hello debug!"`);
+  expect(console).toMatchInlineSnapshot(`
+    "Hello log!
+    Hello info!
+    Hello warn!
+    Hello error!
+    Hello debug!"
+  `);
 });
