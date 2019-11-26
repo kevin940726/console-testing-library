@@ -18,6 +18,10 @@
     "build": "babel index.js -o dist/jest-console.js",
     "test": "jest"
   },
+  "dependencies": {
+    "jest-snapshot": "^24.9.0",
+    "pretty-format": "^24.9.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
@@ -54,8 +58,5 @@
     "bracketSpacing": true,
     "jsxBracketSameLine": false,
     "arrowParens": "avoid"
-  },
-  "dependencies": {
-    "jest-snapshot": "^24.9.0"
   }
 }

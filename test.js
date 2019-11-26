@@ -29,15 +29,17 @@ test('advanced', () => {
 
   expect(getLog().log).toMatchInlineSnapshot(`
     "It works with inline value: foobar, as well as floating point value: 3.14. Pretty cool!
-    Map: Map { 'foo' => 42, [size]: 1 },
-    Set: Set { 42, [size]: 1 },
+    Map: Map {
+      \\"foo\\" => 42,
+    },
+    Set: Set {
+      42,
+    },
     Symbol: Symbol(symbol),
-    object: { foo: 42 },
-    function: [Function: foo] {
-      [length]: 0,
-      [name]: 'foo',
-      [prototype]: foo { [constructor]: [Circular] }
-    }
+    object: Object {
+      \\"foo\\": 42,
+    },
+    function: [Function foo]
     It works with error too
     It works with warning too"
   `);
@@ -49,15 +51,17 @@ test('advanced', () => {
       ],
       Array [
         "log",
-        "Map: Map { 'foo' => 42, [size]: 1 },
-    Set: Set { 42, [size]: 1 },
+        "Map: Map {
+      \\"foo\\" => 42,
+    },
+    Set: Set {
+      42,
+    },
     Symbol: Symbol(symbol),
-    object: { foo: 42 },
-    function: [Function: foo] {
-      [length]: 0,
-      [name]: 'foo',
-      [prototype]: foo { [constructor]: [Circular] }
-    }",
+    object: Object {
+      \\"foo\\": 42,
+    },
+    function: [Function foo]",
       ],
       Array [
         "error",
@@ -71,15 +75,17 @@ test('advanced', () => {
   `);
   expect(getLog().levels.log).toMatchInlineSnapshot(`
     "It works with inline value: foobar, as well as floating point value: 3.14. Pretty cool!
-    Map: Map { 'foo' => 42, [size]: 1 },
-    Set: Set { 42, [size]: 1 },
+    Map: Map {
+      \\"foo\\" => 42,
+    },
+    Set: Set {
+      42,
+    },
     Symbol: Symbol(symbol),
-    object: { foo: 42 },
-    function: [Function: foo] {
-      [length]: 0,
-      [name]: 'foo',
-      [prototype]: foo { [constructor]: [Circular] }
-    }"
+    object: Object {
+      \\"foo\\": 42,
+    },
+    function: [Function foo]"
   `);
   expect(getLog().levels.warn).toMatchInlineSnapshot(
     `"It works with warning too"`
@@ -117,5 +123,37 @@ test('custom toMatchInlineSnapshot on console', () => {
     Hello warn!
     Hello error!
     Hello debug!"
+  `);
+});
+
+test('indent', () => {
+  console.log(
+    `This
+shouldn't be
+  properly
+    indent %o,
+instead
+  we have to
+    do this manually
+%o
+or serialize ourselves`,
+    { foo: 42 },
+    { foo: 42 }
+  );
+
+  expect(console.log).toMatchInlineSnapshot(`
+    "This
+    shouldn't be
+      properly
+        indent Object {
+      \\"foo\\": 42,
+    },
+    instead
+      we have to
+        do this manually
+    Object {
+      \\"foo\\": 42,
+    }
+    or serialize ourselves"
   `);
 });

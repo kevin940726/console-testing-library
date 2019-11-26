@@ -1,11 +1,14 @@
 import { Console } from 'console';
 import { Writable } from 'stream';
 import { toMatchInlineSnapshot } from 'jest-snapshot';
+import prettyFormat from 'pretty-format';
 
 // Keep an instance of the original console and export it
 const originalConsole = global.console;
 global.originalConsole = originalConsole;
 export { originalConsole };
+
+const inspectSymbol = Symbol.for('nodejs.util.inspect.custom');
 
 const instances = new WeakMap();
 
@@ -56,15 +59,12 @@ export function createConsole() {
     },
   });
 
-  const jestConsole = new Console({
-    stdout: writable,
-    stderr: writable,
-  });
+  const jestConsole = new Console(writable, writable);
 
   Object.getOwnPropertyNames(jestConsole).forEach(property => {
     if (typeof jestConsole[property] === 'function') {
       const originalFunction = jestConsole[property];
-      jestConsole[property] = function() {
+      jestConsole[property] = function(...args) {
         currentLevel = undefined;
         currentMethod = property;
         Object.keys(LEVELS).forEach(level => {
@@ -73,7 +73,26 @@ export function createConsole() {
           }
         });
 
-        return originalFunction.apply(this, arguments);
+        const objectArguments = args.filter(
+          argv =>
+            (typeof argv === 'object' || typeof argv === 'function') &&
+            argv !== null
+        );
+
+        objectArguments.forEach(argv => {
+          Object.defineProperty(argv, inspectSymbol, {
+            value: () => prettyFormat(argv),
+            configurable: true,
+          });
+        });
+
+        const returnValue = originalFunction.apply(this, args);
+
+        objectArguments.forEach(argv => {
+          delete argv[inspectSymbol];
+        });
+
+        return returnValue;
       };
 
       Object.defineProperty(jestConsole[property], 'name', {
