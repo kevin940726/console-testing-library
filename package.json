@@ -16,7 +16,8 @@
   "private": false,
   "scripts": {
     "build": "babel index.js -o dist/console-testing-library.js",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "yarn build && yarn test"
   },
   "dependencies": {
     "jest-snapshot": "^24.9.0",
