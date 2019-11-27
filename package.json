@@ -1,6 +1,6 @@
 {
   "name": "console-testing-library",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Testing console the right way",
   "type": "module",
   "main": "dist/console-testing-library.js",
