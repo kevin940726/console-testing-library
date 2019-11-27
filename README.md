@@ -6,33 +6,46 @@ Mocking console the right way.
 
 It's rare to have `console` in your code, it's more often seen in libraries to provide helpful debugging warnings. When trying to mock `console` in tests, we often just `spyOn` the methods being used and observe the mock calls. This works great if your message is simple, but it can also have false-negative.
 
+Consider a situation where we want to log inspectable objects, to make it prettily printed in TTY environments, and interactable in browser's console. There are only 2 options we can do in order to achieve with the current console API. Either by string substitution or with arguments concatenation.
+
 ```js
+// string substitution
+console.error('I want to log this object: %o, and make it inspectable', {
+  foo: 42,
+});
+
+// arguments concatenation
 console.error(
-  'The error has a type named "%s", expected "%s".',
-  'Oops',
-  'Success'
+  'I want to log this object:',
+  { foo: 42 },
+  ', and make it inspectable'
 );
 ```
 
-This is a valid `console.error` call with string substitution, which will output the message `The error has a type named "Oops", expected "Success".`. Normally we would test it using something like `toHaveBeenCalledWith`
+We could use `toHaveBeenCalledWith` here, but the tests would look like this.
 
 ```js
-expect(console.log).toHaveBeenCalledWith(
-  'The error has a type named "%s", expected "%s".',
-  'Oops',
-  'Success'
+// string substitution
+expect(console.error).toHaveBeenCalledWith(
+  'I want to log this object: %o, and make it inspectable',
+  { foo: 42 }
+);
+
+// arguments concatenation
+expect(console.error).toHaveBeenCalledWith(
+  'I want to log this object:',
+  { foo: 42 },
+  ', and make it inspectable'
 );
 ```
 
-But it's not representing the actual output of the message, we're just repeating what we wrote in the source code. If some typo sneaked into it, we won't be able to easily notice it because of the malfunctioned tests.
-
-Converting it to template literals could solve this issue, but sometimes the values are objects, which cannot be serialized to strings or would loose context when doing so. In some environments (like in browsers' console), they will even be represented as inspect-able and interactive-able results, which is not possible to achieve with strings.
+Either way is not ideal, we are just repeating the source code here, we're not testing what the user really sees, but what the code looks like. Every time when the message changed, we have to update the test too, which makes it a fragile test.
 
 A better option would be to get the actual output of the logs and test it against the expected output.
 
 ```js
 expect(actualLog).toBe(
-  'The error has a type named "Oops", expected "Success".'
+  'I want to log this object: { "foo": 42 }, and make it inspectable'
 );
 ```
 
@@ -42,8 +55,18 @@ With `jest-console`, we can easily do that without extra hassles.
 import { getLog } from 'jest-console';
 
 expect(getLog().log).toBe(
-  'The error has a type named "Oops", expected "Success".'
+  'I want to log this object: { "foo": 42 }, and make it inspectable'
 );
+```
+
+With the help of Jest's `toMatchInlineSnapshot`, we can even let it generate the log snapshot inline.
+
+```js
+import { getLog } from 'jest-console';
+
+expect(getLog().log).toMatchInlineSnapshot();
+// or
+expect(console.log).toMatchInlineSnapshot();
 ```
 
 ## Installation

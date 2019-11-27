@@ -8,7 +8,7 @@ const originalConsole = global.console;
 global.originalConsole = originalConsole;
 export { originalConsole };
 
-const inspectSymbol = Symbol.for('nodejs.util.inspect.custom');
+const INSPECT_SYMBOL = Symbol.for('nodejs.util.inspect.custom');
 
 const instances = new WeakMap();
 
@@ -80,7 +80,7 @@ export function createConsole() {
         );
 
         objectArguments.forEach(argv => {
-          Object.defineProperty(argv, inspectSymbol, {
+          Object.defineProperty(argv, INSPECT_SYMBOL, {
             value: () => prettyFormat(argv),
             configurable: true,
           });
@@ -89,7 +89,7 @@ export function createConsole() {
         const returnValue = originalFunction.apply(this, args);
 
         objectArguments.forEach(argv => {
-          delete argv[inspectSymbol];
+          delete argv[INSPECT_SYMBOL];
         });
 
         return returnValue;
