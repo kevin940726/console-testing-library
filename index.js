@@ -59,12 +59,12 @@ export function createConsole() {
     },
   });
 
-  const jestConsole = new Console(writable, writable);
+  const testingConsole = new Console(writable, writable);
 
-  Object.getOwnPropertyNames(jestConsole).forEach(property => {
-    if (typeof jestConsole[property] === 'function') {
-      const originalFunction = jestConsole[property];
-      jestConsole[property] = function(...args) {
+  Object.getOwnPropertyNames(testingConsole).forEach(property => {
+    if (typeof testingConsole[property] === 'function') {
+      const originalFunction = testingConsole[property];
+      testingConsole[property] = function(...args) {
         currentLevel = undefined;
         currentMethod = property;
         Object.keys(LEVELS).forEach(level => {
@@ -95,23 +95,23 @@ export function createConsole() {
         return returnValue;
       };
 
-      Object.defineProperty(jestConsole[property], 'name', {
+      Object.defineProperty(testingConsole[property], 'name', {
         value: property,
       });
-      jestConsole[property].jestConsole = jestConsole;
+      testingConsole[property].testingConsole = testingConsole;
 
       if (typeof jest === 'object' && typeof jest.spyOn === 'function') {
-        jest.spyOn(jestConsole, property);
+        jest.spyOn(testingConsole, property);
 
-        Object.defineProperty(jestConsole[property], 'name', {
+        Object.defineProperty(testingConsole[property], 'name', {
           value: property,
         });
-        jestConsole[property].jestConsole = jestConsole;
+        testingConsole[property].testingConsole = testingConsole;
       }
     }
   });
 
-  instances.set(jestConsole, {
+  instances.set(testingConsole, {
     get log() {
       return logs.map(log => log[1]).join('\n');
     },
@@ -137,21 +137,21 @@ export function createConsole() {
     },
   });
 
-  return jestConsole;
+  return testingConsole;
 }
 
-export function mockConsole(jestConsole) {
+export function mockConsole(testingConsole) {
   const originalConsole = global.console;
 
-  global.console = jestConsole;
+  global.console = testingConsole;
 
   return () => {
     global.console = originalConsole;
   };
 }
 
-export function getLog(jestConsole = global.console) {
-  return instances.get(jestConsole);
+export function getLog(testingConsole = global.console) {
+  return instances.get(testingConsole);
 }
 
 if (typeof beforeEach === 'function' && typeof afterEach === 'function') {
@@ -183,10 +183,10 @@ if (typeof expect === 'function' && typeof expect.extend === 'function') {
       const context = Object.assign(this, { error });
       /* -------------------------------------------------------------- */
 
-      const jestConsoleInstance =
-        (received && received.jestConsole) || received;
+      const testingConsoleInstance =
+        (received && received.testingConsole) || received;
 
-      if (!jestConsoleInstance || !instances.has(jestConsoleInstance)) {
+      if (!testingConsoleInstance || !instances.has(testingConsoleInstance)) {
         return toMatchInlineSnapshot.call(context, received, ...args);
       }
 

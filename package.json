@@ -1,21 +1,21 @@
 {
-  "name": "jest-console",
+  "name": "console-testing-library",
   "version": "0.0.0",
-  "description": "Mocking console the right way",
+  "description": "Testing console the right way",
   "type": "module",
-  "main": "dist/jest-console.js",
+  "main": "dist/console-testing-library.js",
   "exports": {
     ".": {
-      "require": "dist/jest-console.js",
+      "require": "dist/console-testing-library.js",
       "default": "index.js"
     }
   },
-  "repository": "https://github.com/kevin940726/jest-console.git",
+  "repository": "https://github.com/kevin940726/console-testing-library.git",
   "author": "Kai Hao",
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "babel index.js -o dist/jest-console.js",
+    "build": "babel index.js -o dist/console-testing-library.js",
     "test": "jest"
   },
   "dependencies": {

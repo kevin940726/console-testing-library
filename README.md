@@ -1,6 +1,6 @@
-# `jest-console`
+# `console-testing-library`
 
-Mocking console the right way.
+Testing console the right way.
 
 ## Why
 
@@ -10,38 +10,32 @@ Consider a situation where we want to log inspectable objects, to make it pretti
 
 ```js
 // string substitution
-console.error('I want to log this object: %o, and make it inspectable', {
-  foo: 42,
-});
+console.error('I want to log this object: %o, and make it inspectable', obj);
 
 // arguments concatenation
-console.error(
-  'I want to log this object:',
-  { foo: 42 },
-  ', and make it inspectable'
-);
+console.error('I want to log this object:', obj, ', and make it inspectable');
 ```
 
-We could use `toHaveBeenCalledWith` here, but the tests would look like this.
+We could use Jest's `toHaveBeenCalledWith` here, but the tests would look like this.
 
 ```js
 // string substitution
 expect(console.error).toHaveBeenCalledWith(
   'I want to log this object: %o, and make it inspectable',
-  { foo: 42 }
+  obj
 );
 
 // arguments concatenation
 expect(console.error).toHaveBeenCalledWith(
   'I want to log this object:',
-  { foo: 42 },
+  obj,
   ', and make it inspectable'
 );
 ```
 
-Either way is not ideal, we are just repeating the source code here, we're not testing what the user really sees, but what the code looks like. Every time when the message changed, we have to update the test too, which makes it a fragile test.
+Either way is not ideal, we are just repeating the source code here, we're not testing what the user really sees, but what the code looks like. Every time when the message changed, we have to update the test too, which makes it a fragile test. In addition, what if `obj` is not inspectable? Or not valid? Or simply not what we want? We cannot be sure without actually logging the message.
 
-A better option would be to get the actual output of the logs and test it against the expected output.
+A better solution would be to get the actual output of the logs and test it against the expected output.
 
 ```js
 expect(actualLog).toBe(
@@ -49,10 +43,10 @@ expect(actualLog).toBe(
 );
 ```
 
-With `jest-console`, we can easily do that without extra hassles.
+With `console-testing-library`, we can easily do that without extra hassles.
 
 ```js
-import { getLog } from 'jest-console';
+import { getLog } from 'console-testing-library';
 
 expect(getLog().log).toBe(
   'I want to log this object: { "foo": 42 }, and make it inspectable'
@@ -62,7 +56,7 @@ expect(getLog().log).toBe(
 With the help of Jest's `toMatchInlineSnapshot`, we can even let it generate the log snapshot inline.
 
 ```js
-import { getLog } from 'jest-console';
+import { getLog } from 'console-testing-library';
 
 expect(getLog().log).toMatchInlineSnapshot();
 // or
@@ -72,7 +66,7 @@ expect(console.log).toMatchInlineSnapshot();
 ## Installation
 
 ```sh
-yarn add -D jest-console
+yarn add -D console-testing-library
 ```
 
 ## Usage
@@ -80,7 +74,7 @@ yarn add -D jest-console
 Just import it before calling `console.log` or the family.
 
 ```js
-import 'jest-console';
+import 'console-testing-library';
 
 test('testing console.log', () => {
   // No logs will be output to the console
@@ -91,7 +85,7 @@ test('testing console.log', () => {
 If you want to get the current logs, import the `getLog` helper.
 
 ```js
-import { getLog } from 'jest-console';
+import { getLog } from 'console-testing-library';
 
 test('testing console.log', () => {
   console.log('Hello %s!', 'World');
@@ -154,7 +148,7 @@ expect(getLog().logs).toEqual([
 Since the logs are patched, in order to log or debug in the tests will not output as expected. You can import `originalConsole` to obtain the un-patched, un-mocked `console`.
 
 ```js
-import { originalConsole } from 'jest-console';
+import { originalConsole } from 'console-testing-library';
 
 console.log('Oops, this will not show since console.log is mocked.');
 originalConsole.log(
@@ -164,17 +158,17 @@ originalConsole.log(
 
 ## Usage without Jest
 
-It is possible to use `jest-console` without Jest, just that you have to manually mock the console yourself. We provide `createConsole` and `mockConsole` API for this.
+It is possible to use `console-testing-library` without Jest, just that you have to manually mock the console yourself. We provide `createConsole` and `mockConsole` API for this.
 
 ```js
-import { createConsole, mockConsole } from 'jest-console';
+import { createConsole, mockConsole } from 'console-testing-library';
 
-// Create a jestConsole instance. It's possible to create multiple instances if needed
-const jestConsole = createConsole();
+// Create a testingConsole instance. It's possible to create multiple instances if needed
+const testingConsole = createConsole();
 
-// Mock the global.console with the jestConsole we just created
+// Mock the global.console with the testingConsole we just created
 // It returns a restore function, which will swap back to the original console
-const restore = mockConsole(jestConsole);
+const restore = mockConsole(testingConsole);
 
 console.log('Mocked console.log');
 
@@ -184,7 +178,7 @@ restore();
 
 ## Custom matchers
 
-It's often recommended to use `jest-console` with Jest's [`toMatchInlineSnapshot`](https://jestjs.io/docs/en/expect#tomatchinlinesnapshotpropertymatchers-inlinesnapshot) matcher. It makes it really easy to test the console output with confidence.
+It's often recommended to use `console-testing-library` with Jest's [`toMatchInlineSnapshot`](https://jestjs.io/docs/en/expect#tomatchinlinesnapshotpropertymatchers-inlinesnapshot) matcher. It makes it really easy to test the console output with confidence.
 
 ```js
 expect(getLog().log).toMatchInlineSnapshot();
