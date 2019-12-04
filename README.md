@@ -69,7 +69,7 @@ expect(console.log).toMatchInlineSnapshot();
 yarn add -D console-testing-library
 ```
 
-## Usage
+## Usage with Jest
 
 Just import it before calling `console.log` or the family.
 
