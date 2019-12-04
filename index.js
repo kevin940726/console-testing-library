@@ -28,7 +28,7 @@ const LEVELS = {
   error: ['error', 'assert'],
 };
 
-export function createConsole() {
+export function createConsole({ isSilent: defaultIsSilent = true } = {}) {
   let logs = [];
   let records = {};
   let levels = {
@@ -39,6 +39,8 @@ export function createConsole() {
   };
   let currentLevel = undefined;
   let currentMethod = undefined;
+  let isSilent = defaultIsSilent;
+  let targetConsole = undefined;
 
   const writable = new Writable({
     write(chunk, encoding, callback) {
@@ -61,39 +63,63 @@ export function createConsole() {
 
   const testingConsole = new Console(writable, writable);
 
+  testingConsole.clear = function clear() {
+    logs = [];
+    records = {};
+    levels = {
+      log: '',
+      info: '',
+      warn: '',
+      error: '',
+    };
+    currentLevel = undefined;
+    currentMethod = undefined;
+  };
+
   Object.getOwnPropertyNames(testingConsole).forEach(property => {
-    if (typeof testingConsole[property] === 'function') {
-      const originalFunction = testingConsole[property];
-      testingConsole[property] = function(...args) {
-        currentLevel = undefined;
-        currentMethod = property;
-        Object.keys(LEVELS).forEach(level => {
-          if (LEVELS[level].includes(property)) {
-            currentLevel = level;
-          }
-        });
+    if (
+      typeof testingConsole[property] === 'function' &&
+      // Internal properties like `_stdoutErrorHandler` and `_stderrErrorHandler`
+      !property.startsWith('_')
+    ) {
+      if (property !== 'clear') {
+        const originalFunction = testingConsole[property];
 
-        const objectArguments = args.filter(
-          argv =>
-            (typeof argv === 'object' || typeof argv === 'function') &&
-            argv !== null
-        );
-
-        objectArguments.forEach(argv => {
-          Object.defineProperty(argv, INSPECT_SYMBOL, {
-            value: () => prettyFormat(argv),
-            configurable: true,
+        testingConsole[property] = function(...args) {
+          currentLevel = undefined;
+          currentMethod = property;
+          Object.keys(LEVELS).forEach(level => {
+            if (LEVELS[level].includes(property)) {
+              currentLevel = level;
+            }
           });
-        });
 
-        const returnValue = originalFunction.apply(this, args);
+          const objectArguments = args.filter(
+            argv =>
+              (typeof argv === 'object' || typeof argv === 'function') &&
+              argv !== null
+          );
 
-        objectArguments.forEach(argv => {
-          delete argv[INSPECT_SYMBOL];
-        });
+          objectArguments.forEach(argv => {
+            Object.defineProperty(argv, INSPECT_SYMBOL, {
+              value: () => prettyFormat(argv),
+              configurable: true,
+            });
+          });
 
-        return returnValue;
-      };
+          const returnValue = originalFunction.apply(this, args);
+
+          objectArguments.forEach(argv => {
+            delete argv[INSPECT_SYMBOL];
+          });
+
+          if (!isSilent && targetConsole) {
+            targetConsole[property].apply(this, args);
+          }
+
+          return returnValue;
+        };
+      }
 
       Object.defineProperty(testingConsole[property], 'name', {
         value: property,
@@ -135,23 +161,60 @@ export function createConsole() {
     getRecord(method) {
       return records[method] || '';
     },
+    get silence() {
+      return isSilent;
+    },
+    set silence(shouldSilent = true) {
+      isSilent = !!shouldSilent;
+    },
+    get _targetConsole() {
+      return targetConsole;
+    },
+    set _targetConsole(target) {
+      targetConsole = target;
+    },
   });
 
   return testingConsole;
 }
 
-export function mockConsole(testingConsole) {
-  const originalConsole = global.console;
+export function mockConsole(
+  testingConsole,
+  targetConsoleParent = global,
+  targetConsoleKey = 'console'
+) {
+  const targetConsole = targetConsoleParent[targetConsoleKey];
 
-  global.console = testingConsole;
+  targetConsoleParent[targetConsoleKey] = testingConsole;
+
+  const instance = instances.get(testingConsole);
+  instance._targetConsole = targetConsole;
 
   return () => {
-    global.console = originalConsole;
+    targetConsoleParent[targetConsoleKey] = targetConsole;
+
+    instance._targetConsole = undefined;
   };
 }
 
 export function getLog(testingConsole = global.console) {
   return instances.get(testingConsole);
+}
+
+export function silenceConsole(
+  testingConsole = global.console,
+  shouldSilent = true
+) {
+  if (typeof arguments[0] === 'boolean') {
+    testingConsole = global.console;
+    shouldSilent = arguments[0];
+  }
+
+  instances.get(testingConsole).silence = !!shouldSilent;
+}
+
+export function restore() {
+  global.console = originalConsole;
 }
 
 if (typeof beforeEach === 'function' && typeof afterEach === 'function') {

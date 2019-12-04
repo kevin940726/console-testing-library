@@ -1,4 +1,4 @@
-const { getLog } = require('./');
+const { getLog, createConsole, mockConsole, silenceConsole } = require('./');
 
 expect(jest.isMockFunction(console.log)).toBe(false);
 
@@ -156,4 +156,27 @@ or serialize ourselves`,
     }
     or serialize ourselves"
   `);
+});
+
+test('silenceConsole', () => {
+  const notSilentConsole = createConsole();
+  const targetConsole = createConsole();
+  const targetParent = { console: targetConsole };
+
+  const restore = mockConsole(notSilentConsole, targetParent, 'console');
+
+  targetParent.console.log('It should be silent');
+
+  expect(getLog(notSilentConsole).log).toBe('It should be silent');
+  expect(getLog(targetConsole).log).toBe('');
+
+  notSilentConsole.clear();
+  silenceConsole(notSilentConsole, false);
+
+  targetParent.console.log('It should not be silent');
+
+  expect(getLog(notSilentConsole).log).toBe('It should not be silent');
+  expect(getLog(targetParent.console).log).toBe('It should not be silent');
+
+  restore();
 });
