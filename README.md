@@ -196,6 +196,34 @@ expect(console.log).toMatchInlineSnapshot();
 // it will only get the logs calling from `log` method.
 ```
 
+## Silent / Log the output
+
+By default, the console is mocked to be silent. That is, calling `console.log` would not output any actual log to the console, but swallowed into `getLog()`. If you still want to log the output, you can call `silenceConsole`.
+
+```js
+import { silenceConsole } from 'console-testing-library';
+
+console.log('It should be silent.'); // No output
+
+silenceConsole(false); // Set to be not silent
+
+console.log('It should now output the log to console'); // Has output
+
+silenceConsole(true); // Can set it back to be silent
+
+console.log('It should be silent.'); // No output
+```
+
+If the `console` is created by `createConsole`, `silenceConsole` can be called like below.
+
+```js
+const someConsole = createConsole();
+
+mockConsole(someConsole);
+
+silenceConsole(someConsole, false);
+```
+
 ## License
 
 MIT
