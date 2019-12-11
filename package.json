@@ -4,6 +4,7 @@
   "description": "Testing console the right way",
   "type": "module",
   "main": "dist/console-testing-library.js",
+  "typings": "index.d.ts",
   "exports": {
     ".": {
       "require": "dist/console-testing-library.js",
@@ -32,6 +33,11 @@
   "eslintConfig": {
     "extends": "react-app"
   },
+  "eslintIgnore": [
+    "*.d.ts",
+    "dist/",
+    "node_modules/"
+  ],
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"
