@@ -94,24 +94,19 @@ export function createConsole({ isSilent: defaultIsSilent = true } = {}) {
             }
           });
 
-          const objectArguments = args.filter(
-            argv =>
+          const prettiedArguments = args.map(argv => {
+            if (
               (typeof argv === 'object' || typeof argv === 'function') &&
               argv !== null
-          );
+            ) {
+              // We return an object with inspect symbol here because string substitutions requires objects
+              return { [INSPECT_SYMBOL]: () => prettyFormat(argv) };
+            }
 
-          objectArguments.forEach(argv => {
-            Object.defineProperty(argv, INSPECT_SYMBOL, {
-              value: () => prettyFormat(argv),
-              configurable: true,
-            });
+            return argv;
           });
 
-          const returnValue = originalFunction.apply(this, args);
-
-          objectArguments.forEach(argv => {
-            delete argv[INSPECT_SYMBOL];
-          });
+          const returnValue = originalFunction.apply(this, prettiedArguments);
 
           if (!isSilent && targetConsole) {
             targetConsole[property].apply(this, args);
