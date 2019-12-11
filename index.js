@@ -1,5 +1,6 @@
 import { Console } from 'console';
 import { Writable } from 'stream';
+import util from 'util';
 import { toMatchInlineSnapshot } from 'jest-snapshot';
 import prettyFormat from 'pretty-format';
 
@@ -8,7 +9,7 @@ const originalConsole = global.console;
 global.originalConsole = originalConsole;
 export { originalConsole };
 
-const INSPECT_SYMBOL = Symbol.for('nodejs.util.inspect.custom');
+const INSPECT_SYMBOL = util.inspect.custom;
 
 const instances = new WeakMap();
 
