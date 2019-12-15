@@ -220,7 +220,7 @@ if (typeof beforeEach === 'function' && typeof afterEach === 'function') {
     restore = mockConsole(createConsole());
   });
 
-  afterEach(restore);
+  afterEach(() => restore());
 }
 
 if (typeof expect === 'function' && typeof expect.extend === 'function') {
