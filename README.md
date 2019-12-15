@@ -176,6 +176,22 @@ console.log('Mocked console.log');
 restore();
 ```
 
+## Manually mocking with Jest
+
+If your tests run with Jest then the `global.console` is automatically mocked. If you wish to have more control and manually mock it, then import the package from `pure` entry.
+
+```js
+import { createConsole, mockConsole } from 'console-testing-library/pure';
+
+let restore = () => {};
+
+beforeEach(() => {
+  restore = mockConsole(createConsole());
+});
+
+afterEach(() => restore());
+```
+
 ## Custom matchers
 
 It's often recommended to use `console-testing-library` with Jest's [`toMatchInlineSnapshot`](https://jestjs.io/docs/en/expect#tomatchinlinesnapshotpropertymatchers-inlinesnapshot) matcher. It makes it really easy to test the console output with confidence.
