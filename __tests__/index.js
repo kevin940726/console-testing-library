@@ -1,4 +1,4 @@
-const { getLog, createConsole, mockConsole, silenceConsole } = require('./');
+const { getLog, createConsole, mockConsole, silenceConsole } = require('..');
 
 expect(jest.isMockFunction(console.log)).toBe(false);
 
