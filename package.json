@@ -3,12 +3,16 @@
   "version": "0.2.2",
   "description": "Testing console the right way",
   "type": "module",
-  "main": "dist/console-testing-library.js",
+  "main": "dist/index.js",
   "typings": "index.d.ts",
   "exports": {
     ".": {
-      "require": "dist/console-testing-library.js",
-      "default": "index.js"
+      "require": "dist/index.js",
+      "default": "src/index.js"
+    },
+    "./pure": {
+      "require": "dist/pure.js",
+      "default": "src/pure.js"
     }
   },
   "repository": "https://github.com/kevin940726/console-testing-library.git",
@@ -16,7 +20,7 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "babel index.js -o dist/console-testing-library.js",
+    "build": "babel src -d dist",
     "test": "jest",
     "prepare": "yarn build && yarn test"
   },

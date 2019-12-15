@@ -4,11 +4,6 @@ import util from 'util';
 import { toMatchInlineSnapshot } from 'jest-snapshot';
 import prettyFormat from 'pretty-format';
 
-// Keep an instance of the original console and export it
-const originalConsole = global.console;
-global.originalConsole = originalConsole;
-export { originalConsole };
-
 const INSPECT_SYMBOL = util.inspect.custom;
 
 const instances = new WeakMap();
@@ -210,17 +205,7 @@ export function silenceConsole(
 }
 
 export function restore() {
-  global.console = originalConsole;
-}
-
-if (typeof beforeEach === 'function' && typeof afterEach === 'function') {
-  let restore = () => {};
-
-  beforeEach(() => {
-    restore = mockConsole(createConsole());
-  });
-
-  afterEach(() => restore());
+  global.console = global.originalConsole;
 }
 
 if (typeof expect === 'function' && typeof expect.extend === 'function') {
