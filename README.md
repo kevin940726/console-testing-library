@@ -192,6 +192,31 @@ beforeEach(() => {
 afterEach(() => restore());
 ```
 
+## Optionally stripping out Ansi characters
+
+When working with the console, it's not unusual to make the output a bit prettier by
+relying on libraries such as [chalk](https://www.npmjs.com/package/chalk). Those libraries rely on
+[ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors_and_Styles) for styling strings in the terminal.
+
+Although those ANSI codes make the console output nicer, they may make the test data a bit harder to parse and work with for the mere human being (e.g. `Hello [31mWorld[39m!`).
+
+The `createConsole()` function accepts a `stripAnsi` option (defaulting to `false`) to dynamically remove the control characters from what's being logged.
+
+```js
+import { createConsole, getLog, mockConsole } from 'console-testing-library';
+const chalk = require('chalk'); // or any other similar library
+
+const strippingConsole = createConsole({ stripAnsi: true });
+const restore = mockConsole(strippingConsole);
+
+console.log('Hello %s!', chalk.red('World'));
+
+// Yeah! Plain text without any funky ANSI codes.
+expect(getLog().log).toEqual('Hello World!');
+
+restore();
+```
+
 ## Custom matchers
 
 It's often recommended to use `console-testing-library` with Jest's [`toMatchInlineSnapshot`](https://jestjs.io/docs/en/expect#tomatchinlinesnapshotpropertymatchers-inlinesnapshot) matcher. It makes it really easy to test the console output with confidence.
