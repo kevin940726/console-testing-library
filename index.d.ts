@@ -2,6 +2,7 @@ export const originalConsole = Console;
 
 type Options = {
   isSilent?: boolean;
+  stripsAnsi?: boolean;
 };
 
 export enum ConsoleLevels {

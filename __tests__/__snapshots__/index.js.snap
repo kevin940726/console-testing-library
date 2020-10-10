@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`can strip out ansi characters 1`] = `"Hello World!"`;
+
+exports[`simple with ansi characters 1`] = `"Hello [31mWorld![39m"`;

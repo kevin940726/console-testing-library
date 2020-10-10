@@ -1,4 +1,5 @@
 const { getLog, createConsole, mockConsole, silenceConsole } = require('..');
+const chalk = require('chalk');
 
 expect(jest.isMockFunction(console.log)).toBe(false);
 
@@ -6,6 +7,22 @@ test('simple', () => {
   console.log('Hello %s!', 'World');
 
   expect(getLog().log).toMatchInlineSnapshot(`"Hello World!"`);
+});
+
+test('simple with ansi characters', () => {
+  console.log(`Hello ${chalk.red('World!')}`);
+
+  expect(getLog().log).toMatchSnapshot();
+});
+
+test('can strip out ansi characters', () => {
+  const targetConsole = createConsole({ stripsAnsi: true });
+  const restore = mockConsole(targetConsole);
+
+  console.log(`Hello ${chalk.red('World!')}`);
+
+  expect(getLog().log).toMatchSnapshot();
+  restore();
 });
 
 test('advanced', () => {
