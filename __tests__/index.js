@@ -1,4 +1,7 @@
 const { getLog, createConsole, mockConsole, silenceConsole } = require('..');
+const style = require('ansi-styles');
+
+const red = input => `${style.red.open}${input}${style.red.close}`;
 
 expect(jest.isMockFunction(console.log)).toBe(false);
 
@@ -6,6 +9,26 @@ test('simple', () => {
   console.log('Hello %s!', 'World');
 
   expect(getLog().log).toMatchInlineSnapshot(`"Hello World!"`);
+});
+
+test('simple with ansi characters', () => {
+  console.log('Hello %s!', red('World'));
+
+  expect(getLog().log).toMatchInlineSnapshot(`"Hello [31mWorld[39m!"`);
+  expect(getLog().levels.log).toMatchInlineSnapshot(`"Hello [31mWorld[39m!"`);
+  expect(getLog().getRecord('log')).toMatchInlineSnapshot(`"Hello [31mWorld[39m!"`);
+});
+
+test('can strip out ansi characters', () => {
+  const targetConsole = createConsole({ stripAnsi: true });
+  const restore = mockConsole(targetConsole);
+
+  console.log('Hello %s!', red('World'));
+
+  expect(getLog().log).toMatchInlineSnapshot(`"Hello World!"`);
+  expect(getLog().levels.log).toMatchInlineSnapshot(`"Hello World!"`);
+  expect(getLog().getRecord('log')).toMatchInlineSnapshot(`"Hello World!"`);
+  restore();
 });
 
 test('advanced', () => {

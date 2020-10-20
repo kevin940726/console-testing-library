@@ -3,6 +3,7 @@ import { Writable } from 'stream';
 import util from 'util';
 import { toMatchInlineSnapshot } from 'jest-snapshot';
 import prettyFormat from 'pretty-format';
+import ansiStripper from 'strip-ansi';
 
 const INSPECT_SYMBOL = util.inspect.custom;
 
@@ -24,7 +25,10 @@ const LEVELS = {
   error: ['error', 'assert'],
 };
 
-export function createConsole({ isSilent: defaultIsSilent = true } = {}) {
+export function createConsole({
+  isSilent: defaultIsSilent = true,
+  stripAnsi: defaultStripAnsi = false,
+} = {}) {
   let logs = [];
   let records = {};
   let levels = {
@@ -36,6 +40,7 @@ export function createConsole({ isSilent: defaultIsSilent = true } = {}) {
   let currentLevel = undefined;
   let currentMethod = undefined;
   let isSilent = defaultIsSilent;
+  let stripAnsi = defaultStripAnsi;
   let targetConsole = undefined;
 
   const writable = new Writable({
@@ -44,13 +49,14 @@ export function createConsole({ isSilent: defaultIsSilent = true } = {}) {
         .toString('utf8')
         // Strip out the new line character in the end
         .slice(0, -1);
-      logs.push([currentLevel, message]);
+      const normalizedMessage = stripAnsi ? ansiStripper(message) : message;
+      logs.push([currentLevel, normalizedMessage]);
       if (currentLevel && currentLevel in levels) {
-        levels[currentLevel] = [levels[currentLevel], message]
+        levels[currentLevel] = [levels[currentLevel], normalizedMessage]
           .filter(Boolean)
           .join('\n');
       }
-      records[currentMethod] = [records[currentMethod], message]
+      records[currentMethod] = [records[currentMethod], normalizedMessage]
         .filter(Boolean)
         .join('\n');
       callback();
