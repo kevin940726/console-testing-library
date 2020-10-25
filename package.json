@@ -2,6 +2,9 @@
   "name": "console-testing-library",
   "version": "0.4.0",
   "description": "Testing console the right way",
+  "engines": {
+    "node": "^10 || ^12 || ^13"
+  },
   "type": "module",
   "main": "dist/index.js",
   "typings": "index.d.ts",
