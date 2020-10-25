@@ -28,14 +28,14 @@
     "prepare": "yarn build && yarn test"
   },
   "dependencies": {
-    "jest-snapshot": "^24.9.0",
-    "pretty-format": "^24.9.0",
+    "jest-snapshot": "^26.0.0",
+    "pretty-format": "^26.0.0",
     "strip-ansi": "^6.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.4",
-    "@babel/core": "^7.7.4",
-    "@babel/preset-env": "^7.7.4",
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
     "ansi-styles": "^4.3.0",
     "canopic": "^0.2.1"
   },
