@@ -10,12 +10,12 @@
   "typings": "index.d.ts",
   "exports": {
     ".": {
-      "require": "dist/index.js",
-      "default": "src/index.js"
+      "require": "./dist/index.js",
+      "default": "./src/index.js"
     },
     "./pure": {
-      "require": "dist/pure.js",
-      "default": "src/pure.js"
+      "require": "./dist/pure.js",
+      "default": "./src/pure.js"
     }
   },
   "repository": "https://github.com/kevin940726/console-testing-library.git",
