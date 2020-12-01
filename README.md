@@ -145,6 +145,22 @@ expect(getLog().logs).toEqual([
 ]);
 ```
 
+Additionally, the mocked console also exposes the following higher level syntax accessors:
+
+- `stdout`: will return everything that's been logged through `console.log` or `console.info`
+- `stderr`: will return everything that's been logged through `console.warn` or `console.error`
+
+```js
+console.log('This is %s level', 'log');
+console.error('This is %s level', 'error');
+console.info('This is %s level', 'info');
+console.warn('This is %s level', 'warn');
+
+expect(getLog().stdout).toEqual('This is log level\nThis is info level');
+
+expect(getLog().stderr).toEqual('This is error level\nThis is warn level');
+```
+
 Since the logs are patched, in order to log or debug in the tests will not output as expected. You can import `originalConsole` to obtain the un-patched, un-mocked `console`.
 
 ```js

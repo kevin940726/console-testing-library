@@ -43,6 +43,10 @@ export function createConsole({
   let stripAnsi = defaultStripAnsi;
   let targetConsole = undefined;
 
+  const stringifyLogs = logs => {
+    return logs.map(log => log[1]).join('\n');
+  };
+
   const writable = new Writable({
     write(chunk, encoding, callback) {
       const message = chunk
@@ -136,7 +140,7 @@ export function createConsole({
 
   instances.set(testingConsole, {
     get log() {
-      return logs.map(log => log[1]).join('\n');
+      return stringifyLogs(logs);
     },
     get logs() {
       return logs;
@@ -154,6 +158,16 @@ export function createConsole({
       get error() {
         return levels.error;
       },
+    },
+    get stderr() {
+      return stringifyLogs(
+        logs.filter(([logLevel]) => ['warn', 'error'].includes(logLevel))
+      );
+    },
+    get stdout() {
+      return stringifyLogs(
+        logs.filter(([logLevel]) => ['log', 'info'].includes(logLevel))
+      );
     },
     getRecord(method) {
       return records[method] || '';

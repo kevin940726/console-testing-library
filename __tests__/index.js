@@ -11,6 +11,23 @@ test('simple', () => {
   expect(getLog().log).toMatchInlineSnapshot(`"Hello World!"`);
 });
 
+test('stderr and stdout', () => {
+  console.log('log level %s!', 'log');
+  console.error('log level %s!', 'error');
+  console.info('log level %s!', 'info');
+  console.warn('log level %s!', 'warn');
+
+  expect(getLog().stdout).toMatchInlineSnapshot(`
+    "log level log!
+    log level info!"
+  `);
+
+  expect(getLog().stderr).toMatchInlineSnapshot(`
+    "log level error!
+    log level warn!"
+  `);
+});
+
 test('simple with ansi characters', () => {
   console.log('Hello %s!', red('World'));
 

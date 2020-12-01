@@ -23,6 +23,8 @@ export type TestingConsoleInstance = {
     warn: string;
     error: string;
   };
+  stderr: string;
+  stdout: string;
   getRecord: (method: string) => string;
   silence: boolean;
   private _targetConsole: TestingConsole | Console;
