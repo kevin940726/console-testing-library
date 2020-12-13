@@ -125,7 +125,7 @@ test('testing console.log 2', () => {
 Every log have a corresponding **logging level**, you can access each level's log via `getLog().levels`, or access all of them in a list with `getLog().logs`.
 
 ```js
-console.info('This is %s level', 'log');
+console.log('This is %s level', 'log');
 console.info('This is %s level', 'info');
 console.warn('This is %s level', 'warn');
 console.error('This is %s level', 'error');
