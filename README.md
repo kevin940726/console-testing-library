@@ -125,7 +125,7 @@ test('testing console.log 2', () => {
 Every log have a corresponding **logging level**, you can access each level's log via `getLog().levels`, or access all of them in a list with `getLog().logs`.
 
 ```js
-console.info('This is %s level', 'log');
+console.log('This is %s level', 'log');
 console.info('This is %s level', 'info');
 console.warn('This is %s level', 'warn');
 console.error('This is %s level', 'error');
@@ -143,6 +143,22 @@ expect(getLog().logs).toEqual([
   ['warn', 'This is warn level'],
   ['error', 'This is error level'],
 ]);
+```
+
+Additionally, the mocked console also exposes the following higher level syntax accessors:
+
+- `stdout`: will return everything that's been logged through `console.log` or `console.info`
+- `stderr`: will return everything that's been logged through `console.warn` or `console.error`
+
+```js
+console.log('This is %s level', 'log');
+console.error('This is %s level', 'error');
+console.info('This is %s level', 'info');
+console.warn('This is %s level', 'warn');
+
+expect(getLog().stdout).toEqual('This is log level\nThis is info level');
+
+expect(getLog().stderr).toEqual('This is error level\nThis is warn level');
 ```
 
 Since the logs are patched, in order to log or debug in the tests will not output as expected. You can import `originalConsole` to obtain the un-patched, un-mocked `console`.

@@ -10,12 +10,12 @@
   "typings": "index.d.ts",
   "exports": {
     ".": {
-      "require": "dist/index.js",
-      "default": "src/index.js"
+      "require": "./dist/index.js",
+      "default": "./src/index.js"
     },
     "./pure": {
-      "require": "dist/pure.js",
-      "default": "src/pure.js"
+      "require": "./dist/pure.js",
+      "default": "./src/pure.js"
     }
   },
   "repository": "https://github.com/kevin940726/console-testing-library.git",
@@ -33,10 +33,10 @@
     "strip-ansi": "^6.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.12.1",
-    "@babel/core": "^7.12.3",
-    "@babel/preset-env": "^7.12.1",
-    "ansi-styles": "^4.3.0",
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.10",
+    "ansi-styles": "^5.0.0",
     "canopic": "^0.2.1"
   },
   "eslintConfig": {
