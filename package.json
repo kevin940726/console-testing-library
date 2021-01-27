@@ -3,7 +3,7 @@
   "version": "0.5.0",
   "description": "Testing console the right way",
   "engines": {
-    "node": "^10 || ^12 || ^13 || ^14"
+    "node": "^10 || >=12"
   },
   "type": "module",
   "main": "dist/index.js",
