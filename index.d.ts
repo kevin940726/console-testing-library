@@ -1,8 +1,7 @@
-export const originalConsole = Console;
+export declare const originalConsole: Console;
 
 type Options = {
   isSilent?: boolean;
-  stripAnsi?: boolean;
 };
 
 export enum ConsoleLevels {
@@ -27,14 +26,13 @@ export type TestingConsoleInstance = {
   stdout: string;
   getRecord: (method: string) => string;
   silence: boolean;
-  private _targetConsole: TestingConsole | Console;
 };
 
 export function createConsole(options?: Options): TestingConsole;
 
 export function mockConsole(
   testingConsole: TestingConsole,
-  targetConsoleParent?: {} = global,
+  targetConsoleParent?: typeof globalThis,
   targetConsoleKey?: string
 ): () => void;
 
