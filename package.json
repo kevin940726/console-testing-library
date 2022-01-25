@@ -1,6 +1,6 @@
 {
   "name": "console-testing-library",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Testing console the right way",
   "engines": {
     "node": "^10 || >=12"
